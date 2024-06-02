@@ -44,8 +44,8 @@
 </script>
 
 <svelte:head>
-	<title>Der logische Aufbau der Web</title>
-	<meta name="description" content="" />
+	<title>℘(z,τ)</title>
+	<meta name="description" content="Elliptic Modular Function: ℘(z,τ)" />
 	<meta name="keywords" content="" />
 	<meta name="author" content="AUFBAU" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />

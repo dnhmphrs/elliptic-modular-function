@@ -7,11 +7,28 @@
 
   let canvas;
   let aspectRatio;
+  let mouseX = 0;
+  let mouseY = 0;
+  let jthetaData = [];
 
-  onMount(() => {
+  // Load the CSV data
+  async function loadJthetaData() {
+    const response = await fetch('/jtheta_series.csv');
+    const data = await response.text();
+    // console.log(data);
+    const rows = data.split('\n').slice(1);  // Skip the header row
+    for (const row of rows) {
+      const [q, jtheta2, jtheta3, jtheta4] = row.split(',').map(parseFloat);
+      jthetaData.push({ q, jtheta2, jtheta3, jtheta4 });
+    }
+  }
+
+  onMount(async () => {
     // -------------------------------------------------------------------------
     // SETUP CONTEXT
     // -------------------------------------------------------------------------
+
+    await loadJthetaData();  // Load the data before setting up WebGL
 
     const gl = canvas.getContext('webgl');
     if (!gl) {
@@ -43,10 +60,20 @@
         }
     }
 
+    // Mouse move event listener to update uniforms
+    function handleMouseMove(event) {
+      //normalize mouseX and mouseY
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+    }
+
     window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('mousemove', handleMouseMove);
     resizeCanvas(); // Initial resize
 
-		const bg = setupBackground(gl);
+		const bg = setupBackground(gl, jthetaData);
+
+
     // const box = setupBox(gl);
 
 		// const white = hexToWebGLColor(0xf0f0f0);
@@ -60,7 +87,8 @@
 			// gl.clearColor(0, 0, 0, 0);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
-			drawBackground(gl, bg, performance.now(), aspectRatio);
+      // console.log(mouseX, mouseY);
+			drawBackground(gl, bg, performance.now() * 0.001, aspectRatio, mouseX, mouseY);
       // drawBox(gl, box, black, performance.now(), aspectRatio);
 
 			requestAnimationFrame(render);
