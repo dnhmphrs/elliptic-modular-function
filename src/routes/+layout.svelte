@@ -50,7 +50,7 @@
 	<meta name="author" content="AUFBAU" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<link rel="preload" href="/aufbau.svg" as="image" type="image/svg+xml" crossorigin="anonymous" />
+	<!-- <link rel="preload" href="/aufbau.svg" as="image" type="image/svg+xml" crossorigin="anonymous" /> -->
 
 	<!-- <link
 		rel="preload"
@@ -83,11 +83,11 @@
 	<div class="loading">loading.</div>
 {/if}
 
-<div class="app">
+<!-- <div class="app">
 	<main>
 		<slot />
 	</main>
-</div>
+</div> -->
 
 <style>
 	.app {

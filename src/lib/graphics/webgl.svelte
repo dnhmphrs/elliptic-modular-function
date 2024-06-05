@@ -9,26 +9,46 @@
   let aspectRatio;
   let mouseX = 0;
   let mouseY = 0;
-  let jthetaData = [];
 
   // Load the CSV data
-  async function loadJthetaData() {
-    const response = await fetch('/jtheta_series.csv');
-    const data = await response.text();
-    // console.log(data);
-    const rows = data.split('\n').slice(1);  // Skip the header row
-    for (const row of rows) {
-      const [q, jtheta2, jtheta3, jtheta4] = row.split(',').map(parseFloat);
-      jthetaData.push({ q, jtheta2, jtheta3, jtheta4 });
+  // async function loadJthetaData() {
+  //   const response = await fetch('/jtheta_series.csv');
+  //   const data = await response.text();
+  //   // console.log(data);
+  //   const rows = data.split('\n').slice(1);  // Skip the header row
+  //   for (const row of rows) {
+  //     const [q, jtheta2, jtheta3, jtheta4] = row.split(',').map(parseFloat);
+  //     jthetaData.push({ q, jtheta2, jtheta3, jtheta4 });
+  //   }
+  // }
+
+  // make data
+  function generateLattice(omega1, omega2, terms) {
+    let lattice = [];
+    for (let n = -terms; n <= terms; n++) {
+        for (let m = -terms; m <= terms; m++) {
+            if (n !== 0 || m !== 0) {
+                let lam = [n * omega1[0] + m * omega2[0], n * omega1[1] + m * omega2[1]];
+                lattice.push(lam);
+            }
+        }
     }
+    return lattice;
   }
+
+  // Example usage
+  const omega1 = [1.0, 0.0];
+  const omega2 = [Math.cos(2 * Math.PI / 3), Math.sin(2 * Math.PI / 3)];
+  const terms = 6;
+  const latticePoints = generateLattice(omega1, omega2, terms);
+
 
   onMount(async () => {
     // -------------------------------------------------------------------------
     // SETUP CONTEXT
     // -------------------------------------------------------------------------
 
-    await loadJthetaData();  // Load the data before setting up WebGL
+    // await loadJthetaData();  // Load the data before setting up WebGL
 
     const gl = canvas.getContext('webgl');
     if (!gl) {
@@ -41,8 +61,11 @@
     // -------------------------------------------------------------------------
 
     function resizeCanvasToDisplaySize(canvas, multiplier = 1) {
-        const width  = canvas.clientWidth * multiplier | 0;
-        const height = canvas.clientHeight * multiplier | 0;
+        // const width  = canvas.clientWidth * multiplier | 0;
+        // const height = canvas.clientHeight * multiplier | 0;
+
+        const width  = window.innerWidth * multiplier | 0;
+        const height = window.innerHeight * multiplier | 0;
 
         if (canvas.width !== width || canvas.height !== height) {
             canvas.width = width;
@@ -63,6 +86,7 @@
     // Mouse move event listener to update uniforms
     function handleMouseMove(event) {
       //normalize mouseX and mouseY
+      console.log(event.clientX, event.clientY);
       mouseX = (event.clientX / window.innerWidth) * 2 - 1;
       mouseY = (event.clientY / window.innerHeight) * 2 - 1;
     }
@@ -71,7 +95,7 @@
     window.addEventListener('mousemove', handleMouseMove);
     resizeCanvas(); // Initial resize
 
-		const bg = setupBackground(gl, jthetaData);
+		const bg = setupBackground(gl, latticePoints);
 
 
     // const box = setupBox(gl);
